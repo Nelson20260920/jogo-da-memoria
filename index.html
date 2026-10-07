@@ -2,94 +2,88 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#f2f5f8">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Memória Flores">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2e7d32">
 <link rel="manifest" href="manifest.json">
-<title>Jogo da Memória - 10 Flores</title>
+<title>Memória Flores</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;text-align:center;background:#f2f5f8;color:#263238}
-h1{font-size:26px;margin:18px 8px 6px}
-.subtitle{margin:0 10px 12px;color:#607d8b}
-.info{display:flex;justify-content:center;gap:22px;font-size:16px;margin:10px}
-button{font:inherit}
-#restart{border:0;border-radius:10px;padding:9px 18px;background:#4f6f52;color:white;cursor:pointer;margin-bottom:10px}
-#message{min-height:28px;font-weight:bold;color:#4f6f52;margin:3px 8px 10px}
-.board{width:min(94vw,620px);margin:0 auto 20px;display:grid;grid-template-columns:repeat(5,1fr);gap:9px;padding:8px}
-.card{aspect-ratio:1;border:0;background:transparent;perspective:700px;padding:0;cursor:pointer}
-.card-inner{width:100%;height:100%;position:relative;transition:transform .45s;transform-style:preserve-3d}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(160deg,#fff8e7,#e8f5e9 52%,#e3f2fd);color:#234;min-height:100vh}
+.app{width:min(100%,620px);margin:0 auto;padding:14px 12px 24px}
+header{text-align:center;margin-bottom:10px}
+h1{margin:4px 0 2px;font-size:28px;color:#27632a}
+.subtitle{font-size:14px;color:#55705a;margin-bottom:8px}
+.stats{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.stat{background:rgba(255,255,255,.96);border-radius:14px;padding:8px 13px;box-shadow:0 2px 8px rgba(0,0,0,.08);font-size:14px}
+.stat b{color:#216a25}
+.game{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;max-width:520px;margin:0 auto}
+.card{position:relative;width:100%;aspect-ratio:1/1;border:0;border-radius:16px;padding:0;background:transparent;perspective:700px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.card-inner{position:absolute;inset:0;transition:transform .34s ease;transform-style:preserve-3d}
 .card.flipped .card-inner,.card.matched .card-inner{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;border-radius:13px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px #0002}
-.front{background:linear-gradient(145deg,#6f8f72,#46624a);color:white;font-size:31px}
-.back{background:white;transform:rotateY(180deg);overflow:hidden;border:2px solid #d7e0d8}
-.back svg{width:82%;height:82%}
-@media(max-width:420px){h1{font-size:23px}.board{gap:6px;padding:6px}.front{font-size:25px}.info{gap:14px;font-size:14px}}
+.face{position:absolute;inset:0;border-radius:16px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;box-shadow:0 4px 10px rgba(0,0,0,.12);overflow:hidden}
+.back{background:linear-gradient(145deg,#7e57c2,#ec407a 52%,#29b6f6);color:#fff;font-size:32px;font-weight:700}
+.back::before{content:"✿";font-size:34px;opacity:.95;text-shadow:0 2px 4px rgba(0,0,0,.18)}
+.front{transform:rotateY(180deg);border:2px solid rgba(255,255,255,.85);background:linear-gradient(145deg,#fff,#f7fbff)}
+.flower-svg{width:82%;height:82%;max-width:120px;max-height:120px;filter:drop-shadow(0 3px 3px rgba(0,0,0,.13))}
+.matched .front{box-shadow:inset 0 0 0 3px rgba(76,175,80,.34),0 4px 10px rgba(0,0,0,.12)}
+.controls{display:flex;gap:8px;justify-content:center;margin:15px auto 0;max-width:520px}
+button.ctrl{flex:1;border:0;border-radius:13px;padding:11px 12px;font-size:15px;font-weight:700;cursor:pointer}
+#restart{background:#2e7d32;color:#fff}
+#newgame{background:#fff;color:#2e7d32;border:2px solid #66a56a}
+.msg{text-align:center;min-height:27px;font-size:17px;font-weight:700;color:#2e7d32;margin:10px 0 0}
+.note{text-align:center;font-size:12px;color:#68806b;margin-top:6px}
+@media(min-width:700px){.game{gap:11px}.card{border-radius:18px}.face{border-radius:18px}}
 </style>
 </head>
 <body>
-<h1>🌸 Jogo da Memória</h1>
-<p class="subtitle">Encontre os 10 pares de flores</p>
-<div class="info">
-<span>Jogadas: <b id="moves">0</b></span>
-<span>Pares: <b id="pairs">0</b>/10</span>
+<div class="app">
+<header>
+  <h1>🌸 Jogo da Memória – Flores</h1>
+  <div class="subtitle">Encontre os 10 pares</div>
+  <div class="stats">
+    <div class="stat">Jogadas: <b id="moves">0</b></div>
+    <div class="stat">Pares: <b id="pairs">0</b>/10</div>
+    <div class="stat">Tempo: <b id="time">0:00</b></div>
+  </div>
+</header>
+
+<main class="game" id="game" aria-label="Jogo da memória"></main>
+
+<div class="controls">
+  <button class="ctrl" id="restart">↻ Reiniciar</button>
+  <button class="ctrl" id="newgame">🌷 Novo jogo</button>
 </div>
-<button id="restart">🔄 Novo jogo</button>
-<div id="message">Boa sorte!</div>
-<div id="board" class="board"></div>
+<div class="msg" id="msg"></div>
+<div class="note">20 cartas • 10 flores diferentes • 5 linhas × 4 colunas no iPhone</div>
+</div>
 
 <script>
 const flowers=[
-{name:"Rosa",c:["#e85d75","#ffd1da"],m:"#f7b500"},
-{name:"Girassol",c:["#f5b700","#ffd95a"],m:"#6d4c41"},
-{name:"Tulipa",c:["#ef5350","#ff9e9e"],m:"#f7d154"},
-{name:"Margarida",c:["#ffffff","#eeeeee"],m:"#f4c430"},
-{name:"Lírio",c:["#ba68c8","#e1bee7"],m:"#f6c945"},
-{name:"Hibisco",c:["#ef476f","#ff8fab"],m:"#ffd166"},
-{name:"Lavanda",c:["#7e57c2","#b39ddb"],m:"#f5d76e"},
-{name:"Cosmos",c:["#42a5f5","#90caf9"],m:"#f7d354"},
-{name:"Camélia",c:["#ff7043","#ffab91"],m:"#ffe082"},
-{name:"Flor-de-lótus",c:["#ec407a","#f8bbd0"],m:"#f9d65c"}];
+  {name:'Rosa', color:'#e91e63', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><g fill="#e91e63"><circle cx="60" cy="42" r="23"/><circle cx="42" cy="51" r="20"/><circle cx="78" cy="51" r="20"/><circle cx="48" cy="30" r="17"/><circle cx="72" cy="30" r="17"/></g><circle cx="60" cy="46" r="10" fill="#ad1457"/><path d="M58 66 C58 81 57 90 54 105" stroke="#2e7d32" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M57 82 C44 76 35 80 31 88 C43 91 51 90 57 86" fill="#43a047"/><path d="M58 90 C71 83 82 85 88 93 C76 97 66 96 58 92" fill="#66bb6a"/></svg>'},
+  {name:'Girassol', color:'#fbc02d', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><g fill="#fbc02d"><ellipse cx="60" cy="18" rx="8" ry="20"/><ellipse cx="60" cy="102" rx="8" ry="20"/><ellipse cx="18" cy="60" rx="20" ry="8"/><ellipse cx="102" cy="60" rx="20" ry="8"/><ellipse transform="rotate(45 60 60)" cx="60" cy="18" rx="8" ry="20"/><ellipse transform="rotate(45 60 60)" cx="60" cy="102" rx="8" ry="20"/><ellipse transform="rotate(-45 60 60)" cx="60" cy="18" rx="8" ry="20"/><ellipse transform="rotate(-45 60 60)" cx="60" cy="102" rx="8" ry="20"/></g><circle cx="60" cy="60" r="24" fill="#6d4c41"/><circle cx="60" cy="60" r="12" fill="#4e342e"/><path d="M60 83 V108" stroke="#2e7d32" stroke-width="7" stroke-linecap="round"/><path d="M59 94 C46 90 37 94 34 101 C46 104 54 101 59 98" fill="#43a047"/></svg>'},
+  {name:'Tulipa', color:'#ef5350', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><path d="M35 53 C34 34 42 24 49 18 C55 27 60 33 60 45 C60 32 66 24 73 18 C80 27 87 35 85 53 C82 70 71 78 60 78 C49 78 38 70 35 53Z" fill="#ef5350"/><path d="M60 76 V108" stroke="#2e7d32" stroke-width="7" stroke-linecap="round"/><path d="M58 89 C47 84 38 87 35 95 C46 98 54 96 59 93" fill="#66bb6a"/><path d="M61 95 C72 88 81 91 86 98 C76 102 68 101 61 99" fill="#43a047"/></svg>'},
+  {name:'Margarida', color:'#fff59d', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><g fill="#fff59d" stroke="#fdd835" stroke-width="2"><ellipse cx="60" cy="18" rx="10" ry="26"/><ellipse cx="60" cy="102" rx="10" ry="26"/><ellipse cx="18" cy="60" rx="26" ry="10"/><ellipse cx="102" cy="60" rx="26" ry="10"/><ellipse transform="rotate(45 60 60)" cx="60" cy="18" rx="10" ry="26"/><ellipse transform="rotate(45 60 60)" cx="60" cy="102" rx="10" ry="26"/><ellipse transform="rotate(-45 60 60)" cx="60" cy="18" rx="10" ry="26"/><ellipse transform="rotate(-45 60 60)" cx="60" cy="102" rx="10" ry="26"/></g><circle cx="60" cy="60" r="18" fill="#f9a825"/><path d="M60 78 V108" stroke="#2e7d32" stroke-width="7" stroke-linecap="round"/><path d="M59 94 C48 90 40 93 36 100 C47 102 54 100 59 97" fill="#43a047"/></svg>'},
+  {name:'Hibisco', color:'#ff7043', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><g fill="#ff7043"><path d="M60 59 C36 58 19 52 23 32 C25 20 39 17 49 24 C57 30 60 42 60 59Z"/><path d="M60 59 C44 41 42 22 58 14 C69 9 79 20 78 31 C77 43 69 52 60 59Z"/><path d="M60 59 C67 36 79 24 92 31 C103 37 103 51 94 59 C84 67 71 66 60 59Z"/><path d="M60 59 C84 60 99 70 94 84 C90 96 76 98 67 91 C59 84 57 69 60 59Z"/><path d="M60 59 C62 84 56 99 42 98 C29 97 24 85 31 75 C36 67 48 61 60 59Z"/></g><circle cx="60" cy="59" r="12" fill="#fdd835"/><path d="M70 54 C86 43 97 42 106 47" stroke="#fbc02d" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="106" cy="47" r="4" fill="#fbc02d"/><path d="M60 70 V108" stroke="#2e7d32" stroke-width="7" stroke-linecap="round"/></svg>'},
+  {name:'Flor de cerejeira', color:'#ec407a', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><path d="M60 107 C57 90 62 73 66 57 C70 43 79 32 91 24" stroke="#6d4c41" stroke-width="6" fill="none" stroke-linecap="round"/><g fill="#f8bbd0"><path d="M64 56 C50 45 47 32 55 25 C63 18 75 25 78 36 C80 44 73 52 64 56Z"/><path d="M79 47 C76 30 82 19 93 18 C104 18 109 31 103 40 C98 48 88 49 79 47Z"/><path d="M68 38 C55 29 55 17 63 11 C72 5 84 13 84 23 C84 31 77 37 68 38Z"/></g><g fill="#ec407a"><circle cx="63" cy="51" r="7"/><circle cx="78" cy="44" r="7"/><circle cx="70" cy="32" r="7"/></g></svg>'},
+  {name:'Lavanda', color:'#8e6ccf', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><path d="M52 110 C55 84 50 61 45 42" stroke="#2e7d32" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M62 110 C64 79 69 60 78 36" stroke="#43a047" stroke-width="6" fill="none" stroke-linecap="round"/><g fill="#8e6ccf"><ellipse cx="42" cy="40" rx="10" ry="6" transform="rotate(-45 42 40)"/><ellipse cx="40" cy="30" rx="10" ry="6" transform="rotate(-25 40 30)"/><ellipse cx="45" cy="20" rx="10" ry="6" transform="rotate(5 45 20)"/><ellipse cx="74" cy="37" rx="10" ry="6" transform="rotate(-20 74 37)"/><ellipse cx="78" cy="27" rx="10" ry="6" transform="rotate(20 78 27)"/><ellipse cx="82" cy="18" rx="10" ry="6" transform="rotate(45 82 18)"/></g><path d="M58 78 C45 72 36 74 32 82 C44 85 52 83 58 80" fill="#66bb6a"/></svg>'},
+  {name:'Lótus', color:'#ba68c8', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><path d="M60 30 C47 40 40 54 40 72 C40 81 48 87 60 88 C72 87 80 81 80 72 C80 54 73 40 60 30Z" fill="#f3e5f5"/><path d="M60 28 C53 44 54 66 60 82 C66 66 67 44 60 28Z" fill="#ce93d8"/><path d="M60 37 C42 44 34 57 36 71 C38 83 50 89 60 89 C50 75 50 56 60 37Z" fill="#ba68c8"/><path d="M60 37 C78 44 86 57 84 71 C82 83 70 89 60 89 C70 75 70 56 60 37Z" fill="#ab47bc"/><path d="M42 86 Q60 76 78 86 Q72 100 60 103 Q48 100 42 86Z" fill="#43a047"/><circle cx="60" cy="66" r="7" fill="#fdd835"/></svg>'},
+  {name:'Buquê', color:'#42a5f5', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><path d="M45 68 L60 108 L75 68Z" fill="#c8e6c9"/><path d="M60 77 V108" stroke="#2e7d32" stroke-width="6" stroke-linecap="round"/><g><circle cx="39" cy="49" r="18" fill="#ef5350"/><circle cx="60" cy="38" r="20" fill="#42a5f5"/><circle cx="80" cy="49" r="18" fill="#ffca28"/><circle cx="49" cy="57" r="17" fill="#ab47bc"/><circle cx="71" cy="58" r="17" fill="#66bb6a"/></g><g fill="#fff"><circle cx="39" cy="49" r="5"/><circle cx="60" cy="38" r="5"/><circle cx="80" cy="49" r="5"/><circle cx="49" cy="57" r="5"/><circle cx="71" cy="58" r="5"/></g></svg>'},
+  {name:'Roseta', color:'#ffb74d', svg:'<svg class="flower-svg" viewBox="0 0 120 120" aria-hidden="true"><g fill="#ffb74d"><circle cx="60" cy="20" r="16"/><circle cx="87" cy="34" r="16"/><circle cx="98" cy="62" r="16"/><circle cx="87" cy="89" r="16"/><circle cx="60" cy="100" r="16"/><circle cx="33" cy="89" r="16"/><circle cx="22" cy="62" r="16"/><circle cx="33" cy="34" r="16"/></g><circle cx="60" cy="60" r="22" fill="#ef6c00"/><circle cx="60" cy="60" r="10" fill="#ffe082"/><path d="M59 82 V108" stroke="#2e7d32" stroke-width="7" stroke-linecap="round"/></svg>'}
+];
 
-const board=document.getElementById("board"),movesEl=document.getElementById("moves"),
-pairsEl=document.getElementById("pairs"),message=document.getElementById("message");
-let first=null,second=null,lock=false,moves=0,pairs=0;
-
-function svg(i){
- const f=flowers[i],p=[];
- for(let k=0;k<8;k++){p.push(`<ellipse cx="50" cy="31" rx="13" ry="25" fill="${f.c[k%2]}" transform="rotate(${k*45} 50 50)"/>`)}
- return `<svg viewBox="0 0 100 100">${p.join("")}<circle cx="50" cy="50" r="13" fill="${f.m}"/><circle cx="46" cy="46" r="3" fill="#fff8"/></svg>`;
-}
-function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function start(){
- board.innerHTML="";first=second=null;lock=false;moves=0;pairs=0;
- movesEl.textContent=0;pairsEl.textContent=0;message.textContent="Boa sorte!";
- shuffle([...Array(10).keys(),...Array(10).keys()]).forEach(id=>{
-  const card=document.createElement("button");
-  card.className="card";card.dataset.id=id;
-  card.innerHTML=`<div class="card-inner"><div class="face front">🌼</div><div class="face back">${svg(id)}</div></div>`;
-  card.addEventListener("click",()=>flip(card));board.appendChild(card);
- });
-}
-function flip(card){
- if(lock||card===first||card.classList.contains("matched"))return;
- card.classList.add("flipped");
- if(!first){first=card;return}
- second=card;lock=true;moves++;movesEl.textContent=moves;
- if(first.dataset.id===second.dataset.id){
-  setTimeout(()=>{
-   first.classList.add("matched");second.classList.add("matched");
-   pairs++;pairsEl.textContent=pairs;first=second=null;lock=false;
-   if(pairs===10)message.textContent=`🎉 Parabéns! Todas as flores em ${moves} jogadas!`;
-  },450);
- }else{
-  setTimeout(()=>{first.classList.remove("flipped");second.classList.remove("flipped");first=second=null;lock=false},850);
- }
-}
-document.getElementById("restart").onclick=start;
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js"));
-start();
+let deck=[];let first=null;let second=null;let lock=false;let moves=0;let pairs=0;let seconds=0;let timer=null;
+const game=document.getElementById('game');const movesEl=document.getElementById('moves');const pairsEl=document.getElementById('pairs');const timeEl=document.getElementById('time');const msgEl=document.getElementById('msg');
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function formatTime(s){const m=Math.floor(s/60);const sec=String(s%60).padStart(2,'0');return `${m}:${sec}`;}
+function startTimer(){if(timer)return;timer=setInterval(()=>{seconds++;timeEl.textContent=formatTime(seconds)},1000);}
+function stopTimer(){if(timer){clearInterval(timer);timer=null;}}
+function createDeck(){deck=shuffle([...flowers,...flowers].map((f,i)=>({...f,id:i,matched:false})));}
+function render(){game.innerHTML='';deck.forEach((item,index)=>{const button=document.createElement('button');button.className='card';button.setAttribute('aria-label','Carta fechada');button.innerHTML=`<span class="card-inner"><span class="face back" aria-hidden="true"></span><span class="face front" style="background:linear-gradient(145deg,#fff 0%,${item.color}22 100%)"><span>${item.svg}</span></span></span>`;button.addEventListener('click',()=>flip(button,index));game.appendChild(button);});}
+function resetStats(){moves=0;pairs=0;seconds=0;first=null;second=null;lock=false;movesEl.textContent='0';pairsEl.textContent='0';timeEl.textContent='0:00';msgEl.textContent='';stopTimer();}
+function newGame(){resetStats();createDeck();render();}
+function flip(button,index){if(lock||button.classList.contains('flipped')||button.classList.contains('matched'))return;startTimer();button.classList.add('flipped');if(!first){first={button,index};return;}second={button,index};moves++;movesEl.textContent=moves;lock=true;const a=deck[first.index];const b=deck[second.index];if(a.name===b.name){first.button.classList.add('matched');second.button.classList.add('matched');pairs++;pairsEl.textContent=pairs;setTimeout(()=>{first=null;second=null;lock=false;if(pairs===flowers.length){stopTimer();msgEl.textContent=`🎉 Parabéns! Você encontrou os 10 pares em ${moves} jogadas.`;}},220);}else{setTimeout(()=>{first.button.classList.remove('flipped');second.button.classList.remove('flipped');first=null;second=null;lock=false;},760);}}
+document.getElementById('restart').addEventListener('click',newGame);document.getElementById('newgame').addEventListener('click',newGame);newGame();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 </script>
 </body>
 </html>

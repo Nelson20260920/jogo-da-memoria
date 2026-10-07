@@ -1,11 +1,12 @@
 {
-  "name":"Jogo da Memória - 10 Flores",
-  "short_name":"Memória Flores",
-  "description":"Jogo da memória com 10 pares de flores.",
-  "start_url":"./",
-  "display":"standalone",
-  "background_color":"#f2f5f8",
-  "theme_color":"#f2f5f8",
-  "lang":"pt-BR",
-  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "name": "Jogo da Memória – Flores",
+  "short_name": "Memória Flores",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#e8f5e9",
+  "theme_color": "#2e7d32",
+  "lang": "pt-BR",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
 }
